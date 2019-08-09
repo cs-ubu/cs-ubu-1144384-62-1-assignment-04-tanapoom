@@ -104,7 +104,7 @@ class _AppHomePageState extends State<AppHomePage> {
                   )),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text('Brand: ${c["model"]}'),
+                  child: Text('Model: ${c["model"]}'),
                 ),
                 Text('Brand: ${c["brand"]}')
               ]),
