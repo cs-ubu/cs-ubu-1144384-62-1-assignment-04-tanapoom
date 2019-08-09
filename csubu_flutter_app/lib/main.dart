@@ -46,8 +46,7 @@ class _AppHomePageState extends State<AppHomePage> {
   var _page = 0;
 
   _getCars() async {
-    var url =
-        'http://cs.sci.ubu.ac.th:7512/topic-1/5711403250/_search?from=${_page * 10}&size=10';
+    var url ='http://cs.sci.ubu.ac.th:7512/topic-1/5711403250/_search?from=${_page * 10}&size=10';
     const headers = {'Content-Type': 'application/json; charset=utf-8'};
     const query = {
       'query': {'match_all': {}}
@@ -121,7 +120,7 @@ class _AppHomePageState extends State<AppHomePage> {
         CircularProgressIndicator(),
         
         Text('Click the button '),
-        Icon(Icons.get_app)
+        Icon(Icons.cloud_download)
       ],
     );
   }
@@ -143,7 +142,7 @@ class _AppHomePageState extends State<AppHomePage> {
         floatingActionButton: FloatingActionButton(
           onPressed: _incrementCounter,
           tooltip: 'Increment',
-          child: Icon(Icons.get_app), // Icon(Icons.add),
+          child: Icon(Icons.cloud_download), // Icon(Icons.add),
         ));
   }
 }
