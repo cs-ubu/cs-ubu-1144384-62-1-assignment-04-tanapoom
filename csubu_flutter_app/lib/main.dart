@@ -20,7 +20,7 @@ class CSUBUFlutterApp extends StatelessWidget {
     return MaterialApp(
       title: appTitle,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.orange,
         //fontFamily: 'Roboto'
       ),
       home: AppHomePage(title: appTitle),
@@ -44,9 +44,10 @@ class _AppHomePageState extends State<AppHomePage> {
   var _car = [];
   var _loading = true;
   var _page = 0;
-
+  var like = false;
   _getCars() async {
-    var url ='http://cs.sci.ubu.ac.th:7512/topic-1/5711403250/_search?from=${_page * 10}&size=10';
+    var url =
+        'http://cs.sci.ubu.ac.th:7512/topic-1/5711403250/_search?from=${_page * 10}&size=10';
     const headers = {'Content-Type': 'application/json; charset=utf-8'};
     const query = {
       'query': {'match_all': {}}
@@ -60,15 +61,25 @@ class _AppHomePageState extends State<AppHomePage> {
       result.forEach((item) {
         if (item.containsKey('_source')) {
           var source = item['_source'];
-          if (source.containsKey('model') && source.containsKey('brand')) {
+          if (source.containsKey('model') &&
+              source.containsKey('brand') &&
+              source.containsKey('like')) {
             _car.add(item['_source']);
           }
         }
       });
     }
     setState(() {
+      
       _loading = false;
     });
+  }
+
+  void _like() {
+    setState(() {
+       like = !like; 
+      });
+    print(like);
   }
 
   void _incrementCounter() {
@@ -80,33 +91,79 @@ class _AppHomePageState extends State<AppHomePage> {
   }
 
   Widget carWidgets(BuildContext context) {
-    return ListView.separated(
+    return ListView.builder(
         itemCount: _car.length,
         padding: const EdgeInsets.all(8.0),
-        separatorBuilder: (context, i) => const Divider(),
+        //separatorBuilder: (context, i) => const Divider(),
         itemBuilder: (context, i) {
           final c = _car[i];
           var sum = 0;
-          c['brand'].runes.forEach((c) {
-            sum += c;
-          });
           return Card(
             child: ListTile(
               title: Column(children: <Widget>[
                 Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Image.network(
+                    child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Image.network(
                     '${c["pic"]}',
                     width: 300,
                     height: 200,
-                ),
-                  )),
+                  ),
+                )),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text('Model: ${c["model"]}'),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Column(
+                          children: <Widget>[
+                            Column(
+                              children: <Widget>[
+                                Text('${c["model"]}',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold)),
+                                Text(
+                                  'Brand: ${c["brand"]}',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Container(
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: Column(
+                              children: <Widget>[
+                                Text(
+                                  '${c["like"]}',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                                IconButton(
+                                    icon: Icon(
+                                      (like) ? Icons.thumb_up : Icons.thumb_up,
+                                      color: (like)
+                                          ? Colors.blueAccent
+                                          : Colors.black38,
+                                      
+                                    ),
+                                    
+                                    onPressed: _like
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
-                Text('Brand: ${c["brand"]}')
               ]),
             ),
           );
@@ -118,7 +175,6 @@ class _AppHomePageState extends State<AppHomePage> {
       children: <Widget>[
         Text('loading....'),
         CircularProgressIndicator(),
-        
         Text('Click the button '),
         Icon(Icons.cloud_download)
       ],
@@ -128,21 +184,23 @@ class _AppHomePageState extends State<AppHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
-        body: Center(
-          child: (_loading) ? loadingWidget(context) : carWidgets(context),
-        ),
-        bottomNavigationBar: BottomAppBar(
-          child: Container(
-            height: 0,
+      appBar: AppBar(
+        title: Text(widget.title),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.cloud_download),
+            onPressed: _incrementCounter,
           ),
+        ],
+      ),
+      body: Center(
+        child: (_loading) ? loadingWidget(context) : carWidgets(context),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Container(
+          height: 0,
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: _incrementCounter,
-          tooltip: 'Increment',
-          child: Icon(Icons.cloud_download), // Icon(Icons.add),
-        ));
+      ),
+    );
   }
 }
